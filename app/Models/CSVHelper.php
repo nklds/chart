@@ -82,6 +82,29 @@ class CSVHelper
     {
         return (float)array_sum($array) / count($array);
     }
+    public static function getCallback($period): \Closure
+    {
+        $callbacks = [
+            'initial' => fn($i) => CSVHelper::getInitialFromStr($i),
+            'day' => fn($i) => CSVHelper::getDayFromStr($i),
+            'week' => fn($i) => CSVHelper::getWeekFromStr($i),
+            'month' => fn($i) => CSVHelper::getMonthFromStr($i),
+            'year' => fn($i) => CSVHelper::getYearFromStr($i),
+
+        ];
+        return $callbacks[$period];
+    }
+    public static function prepareData($data, $period): array
+    {
+        $newData = CSVHelper::diffDataBy($data,
+            self::getCallback($period)
+        );
+
+        foreach ($newData as $key => $value) {
+            $newData[$key] = CSVHelper::average($value);
+        }
+        return $newData;
+    }
 
     public static function linkArrays(array $initial, array $linked, callable $cb): array
     {
