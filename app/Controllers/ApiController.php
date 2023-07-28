@@ -31,15 +31,9 @@ class ApiController extends Controller
         $response = $this->app->response;
         $data = Storage::getCSVData('data/data.csv');
         $initialData = CSVHelper::prepareData($data, 'initial');
+        $data = CSVHelper::prepareData($data, $period);
+        $data = CSVHelper::linkArrays($initialData, $data, CSVHelper::getCallback($period));
 
-
-        if ($period != 'initial') {
-            $data = CSVHelper::prepareData($data, $period);
-            $data = CSVHelper::linkArrays($initialData,
-                $data,
-                CSVHelper::getCallback($period)
-            );
-        } else $data = $initialData;
         $response
             ->setData(array_reverse($data))
             ->toJSON()
